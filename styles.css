@@ -1,0 +1,98 @@
+.container {
+    width: 90%;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+#search {
+    width: 50%;
+    padding: 5px;
+}
+
+#add-exercise, #rename-exercise, #export-data{
+    padding: 5px 10px;
+    margin-left: 10px;
+}
+
+#rename-exercise {
+    visibility: hidden;
+}
+
+#save-button {
+    padding: 10px 20px;
+    background-color: lightblue;
+    border: none;
+    cursor: pointer;
+}
+
+#history, #exercise-list {
+    margin-top: 30px;
+}
+
+#history-table, #exercise-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#history-table th, #history-table td, #exercise-list-table th, #exercise-list-table td{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#history-table th, #exercise-list-table th {
+    background-color: lightblue;
+    color: black;
+}
+
+.input-group {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin: 20px;
+}
+
+label {
+    margin-right: 10px;
+}
+
+input {
+    width: 50px;
+    margin-right: 10px;
+}
+
+#weight, #reps {
+    width: 70px;
+    margin: 10px;
+    font-size: x-large;
+}
+
+#input-container {
+    display: grid;
+    visibility: hidden;
+}
+
+#autocomplete {
+    border: 1px solid #ddd;
+    display: block;
+    position: absolute;
+    background-color: #f6f6f6;
+    z-index: 1;
+}
+
+#autocomplete div {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+#autocomplete div:hover {
+    background-color: #e9e9e9;
+}
+
+#history {
+    visibility: hidden;
+}
