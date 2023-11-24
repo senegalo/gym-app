@@ -9,13 +9,26 @@
 }
 
 #search {
-    width: 50%;
+    width: 100%;
     padding: 5px;
+    font-size: 1rem;
+}
+
+.search-controls {
+    margin-top: 1rem;
+}
+
+.export-controls {
+    margin-top: 1rem
 }
 
 #add-exercise, #rename-exercise, #export-data{
     padding: 5px 10px;
-    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#add-exercise {
+    visibility: hidden;
 }
 
 #rename-exercise {

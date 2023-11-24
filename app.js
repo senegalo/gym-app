@@ -107,7 +107,8 @@ function insertHistory(weight, reps, timestamp, repId) {
     const delRepCell = document.createElement("td");
     const delLink = document.createElement("a");
     delLink.appendChild(document.createTextNode("Del"));
-    delLink.href = "javascript:delRep(" + repId + ")";
+    delLink.href = "javascript:void(0)";
+    delLink.onclick = () => { if(confirm("Are you sure you want to delete this set ?")){ delRep(repId)}}
     delRepCell.appendChild(delLink)
 
     tr.appendChild(weightCell);
@@ -121,7 +122,8 @@ function reloadExercisesList(){
     while(exRecords.length > 0){
         exRecords[0].remove();
     }
-    exercises.forEach(e => {
+    const sortedE = exercises.toSorted((a,b) => Math.max(...b.sets.map(s => s.timestamp))-Math.max(...a.sets.map(s=> s.timestamp)));
+    sortedE.forEach(e => {
         const tr = document.createElement("tr");
         tr.classList.add("exercise-record");
         exerciseListTable.appendChild(tr);
@@ -138,21 +140,30 @@ function reloadExercisesList(){
         const lastSetCell = document.createElement("td");
         lastSetCell.appendChild(document.createTextNode(sortedSets.length > 0 ? new Date(sortedSets[0].timestamp) : "Nothing Recorded Yet"))
 
+        const delCell = document.createElement("td");
+        const delLink = document.createElement("a");
+        delLink.href="javascript:void(0)";
+        delLink.onclick = () => { if(confirm("Are you sure you want to delete ("+e.name+")?")){ delExercise(e.id)}}
+        delLink.appendChild(document.createTextNode("Del"));
+        delCell.appendChild(delLink);
+
         tr.appendChild(exNameCell);
         tr.appendChild(lastSetCell);
+        tr.appendChild(delCell);
     })
 }
 
 function saveSets() {
     const timestamp = Date.now();
     currentExercise.sets.push({
-        id: currentExercise.sets.length,
+        id: Date.now(),
         reps: repsInput.value,
         weight: weightInput.value,
         timestamp: timestamp
     });
     persistToLocalStorage();
     loadExercise(currentExercise.id);
+    reloadExercisesList();
 }
 
 function renameExercise() {
@@ -160,12 +171,27 @@ function renameExercise() {
     renameExerciseBtn.style.visibility = "hidden";
     persistToLocalStorage();
     loadExercise(currentExercise.id);
+    reloadExercisesList();
+}
+
+function delExercise(eID) {
+    const index = exercises.findIndex(ex=> ex.id == eID);
+    if (index !== -1) {
+        exercises.splice(index, 1);
+    }
+    persistToLocalStorage();
+    clearHistory();
+    reloadExercisesList();
+    history.style.visibility = "hidden";
+    inputContainer.style.visibility = "hidden";
+    searchBox.value = "";
 }
 
 function addExercise() {
-    const exerciseId = exercises.length;
+    renameExerciseBtn.style.visibility = "hidden";
+    const exerciseId = Date.now();
     exercises.push({
-        id: exercises.length,
+        id: exerciseId,
         name: searchBox.value,
         sets: []
     });
