@@ -56,11 +56,17 @@ function loadExercise(exerciseID) {
 
     searchBox.value = ex.name;
 
-    clearHistory();
-    const sortedSets = ex.sets.toSorted((a, b) => b.timestamp - a.timestamp);
-    for (let i = 0; i < sortedSets.length; i++) {
-        insertHistory(sortedSets[i].weight, sortedSets[i].reps, sortedSets[i].timestamp, sortedSets[i].id);
-    }
+    Display.removeElementsByClassname("history-record");
+
+    const sortedSets = ex.sets
+        .toSorted((a, b) => b.timestamp - a.timestamp)
+        .map(e => [
+            e.weight,
+            e.reps,
+            Display.formatDateTime(e.timestamp),
+            Display.confirmActionLink("Del", "Are you sure you want to delete this set ?", () => delRep(e.id))
+        ]);
+    historyTable.append(...Display.createRows(sortedSets, "history-record"));
     currentExercise = ex;
 }
 
@@ -83,74 +89,21 @@ function clearRepsAndWeightsInputs() {
     repsInput.value = DEFAULT_REPS;
 }
 
-function clearHistory() {
-    const elements = document.getElementsByClassName("history-record");
-    while (elements.length > 0) {
-        elements[0].remove();
-    }
-}
-
-function insertHistory(weight, reps, timestamp, repId) {
-    const tr = document.createElement("tr");
-    tr.classList.add("history-record");
-    historyTable.appendChild(tr);
-
-    const weightCell = document.createElement("td");
-    weightCell.appendChild(document.createTextNode(weight));
-
-    const repsCell = document.createElement("td");
-    repsCell.appendChild(document.createTextNode(reps));
-
-    const timestampCell = document.createElement("td");
-    timestampCell.appendChild(document.createTextNode(new Date(timestamp)));
-
-    const delRepCell = document.createElement("td");
-    const delLink = document.createElement("a");
-    delLink.appendChild(document.createTextNode("Del"));
-    delLink.href = "javascript:void(0)";
-    delLink.onclick = () => { if(confirm("Are you sure you want to delete this set ?")){ delRep(repId)}}
-    delRepCell.appendChild(delLink)
-
-    tr.appendChild(weightCell);
-    tr.appendChild(repsCell);
-    tr.appendChild(timestampCell);
-    tr.appendChild(delRepCell);
-}
-
 function reloadExercisesList(){
     const exRecords = document.getElementsByClassName("exercise-record");
     while(exRecords.length > 0){
         exRecords[0].remove();
     }
-    const sortedE = exercises.toSorted((a,b) => Math.max(...b.sets.map(s => s.timestamp))-Math.max(...a.sets.map(s=> s.timestamp)));
-    sortedE.forEach(e => {
-        const tr = document.createElement("tr");
-        tr.classList.add("exercise-record");
-        exerciseListTable.appendChild(tr);
-
-        const exNameCell = document.createElement("td");
-        const exNameLink = document.createElement("a");
-        exNameLink.onclick = () => loadExercise(e.id);
-        exNameLink.href = "javascript:void(0)";
-        exNameLink.appendChild(document.createTextNode(e.name));
-        exNameCell.appendChild(exNameLink);
-
+    const sortedE = exercises.toSorted((a,b) => Math.max(...b.sets.map(s => s.timestamp))-Math.max(...a.sets.map(s=> s.timestamp)))
+    .map(e => {
         const sortedSets = e.sets.toSorted((a,b) => b.timestamp - a.timestamp);
+        return [
+            Display.createLink(e.name, () => loadExercise(e.id)),
+            sortedSets.length > 0 ? Display.formatDateTime(sortedSets[0].timestamp) : "Nothing Recorded Yet",
+            Display.confirmActionLink("Del", "Are you sure you want to delete this exercise ?", () => delExercise(e.id))
+    ]});
 
-        const lastSetCell = document.createElement("td");
-        lastSetCell.appendChild(document.createTextNode(sortedSets.length > 0 ? new Date(sortedSets[0].timestamp) : "Nothing Recorded Yet"))
-
-        const delCell = document.createElement("td");
-        const delLink = document.createElement("a");
-        delLink.href="javascript:void(0)";
-        delLink.onclick = () => { if(confirm("Are you sure you want to delete ("+e.name+")?")){ delExercise(e.id)}}
-        delLink.appendChild(document.createTextNode("Del"));
-        delCell.appendChild(delLink);
-
-        tr.appendChild(exNameCell);
-        tr.appendChild(lastSetCell);
-        tr.appendChild(delCell);
-    })
+    exerciseListTable.append(...Display.createRows(sortedE, "exercise-record"));
 }
 
 function saveSets() {
@@ -245,6 +198,10 @@ function exportData() {
 searchBox.oninput = function (ev) {
     autocomplete(searchBox.value);
 };
+
+searchBox.onclick = () => {
+    searchBox.select();
+}
 
 saveBtn.onclick = function (ev) {
     saveSets();
