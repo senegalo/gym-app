@@ -56,7 +56,7 @@ function loadExercise(exerciseID) {
 
     searchBox.value = ex.name;
 
-    Display.removeElementsByClassname("history-record");
+    clearHistory();
 
     const sortedSets = ex.sets
         .toSorted((a, b) => b.timestamp - a.timestamp)
@@ -67,7 +67,12 @@ function loadExercise(exerciseID) {
             Display.confirmActionLink("Del", "Are you sure you want to delete this set ?", () => delRep(e.id))
         ]);
     historyTable.append(...Display.createRows(sortedSets, "history-record"));
+    window.scroll({top: 0, left: 0, behavior: 'smooth'});
     currentExercise = ex;
+}
+
+function clearHistory(){
+    Display.removeElementsByClassname("history-record");
 }
 
 function getExerciseByID(id) {
