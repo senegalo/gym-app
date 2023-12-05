@@ -1,18 +1,20 @@
 class Display {
-    static createRows(rows, rowClass) {
-        return rows.map(row => {
-            const tr = document.createElement("tr");
-            if (rowClass) {
-                tr.classList.add(rowClass);
-            }
 
-            row.forEach(col => {
-                const td = document.createElement("td");
-                td.append(col);
-                tr.append(td);
-            })
-            return tr;
-        });
+    static createRow(row, rowClasses = []) {
+        const tr = document.createElement("tr");
+        if (rowClasses.length > 0) {
+            tr.classList.add(...rowClasses);
+        }
+        row.forEach(col => {
+            const td = document.createElement("td");
+            td.append(col);
+            tr.append(td);
+        })
+        return tr;
+    }
+
+    static createRows(rows, rowClass) {
+        return rows.map(row => this.createRow(row, [rowClass]));
     }
 
     static createLink(text, action) {

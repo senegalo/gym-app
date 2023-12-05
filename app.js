@@ -17,6 +17,8 @@ let currentExercise;
 
 
 function fuzzySearch(needle, haystack) {
+    needle = needle.toLowerCase();
+    haystack = haystack.toLowerCase();
     const haystackLength = haystack.length;
     const needleLength = needle.length;
 
@@ -90,15 +92,28 @@ function loadExercise(exerciseID) {
 
     clearHistory();
 
+    let oldDate;
+    let rotatingClasses = ["light-background", "grey-background"];
+    let rotatingIndex = 0;
+
     const sortedSets = ex.sets
         .toSorted((a, b) => b.timestamp - a.timestamp)
-        .map(e => [
-            e.weight,
-            e.reps,
-            Display.formatDateTime(e.timestamp),
-            Display.confirmActionLink("Del", "Are you sure you want to delete this set ?", () => delRep(e.id))
-        ]);
-    historyTable.append(...Display.createRows(sortedSets, "history-record"));
+        .map(e => {
+            let date = (new Date(e.timestamp)).toLocaleDateString();
+            if(oldDate != date) {
+                rotatingIndex++;
+                oldDate = date;
+            }
+            let cls = ["history-record", rotatingClasses[rotatingIndex%rotatingClasses.length]];
+            let data = [
+                e.weight,
+                e.reps,
+                Display.formatDateTime(e.timestamp),
+                Display.confirmActionLink("Del", "Are you sure you want to delete this set ?", () => delRep(e.id))
+            ]
+            return Display.createRow(data, cls);
+        });
+    historyTable.append(...sortedSets);
     window.scroll({top: 0, left: 0, behavior: 'smooth'});
     currentExercise = ex;
 }
