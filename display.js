@@ -11,7 +11,7 @@ class Display {
                 td.append(col);
                 tr.append(td);
             })
-           return tr; 
+            return tr;
         });
     }
 

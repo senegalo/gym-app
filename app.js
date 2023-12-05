@@ -15,13 +15,45 @@ const renameExerciseBtn = document.getElementById("rename-exercise");
 const exportBtn = document.getElementById("export-data");
 let currentExercise;
 
+
+function fuzzySearch(needle, haystack) {
+    const haystackLength = haystack.length;
+    const needleLength = needle.length;
+
+    if (needleLength == 0 || needleLength > haystackLength) {
+        return false;
+    }
+
+    if (needleLength === haystackLength) {
+        return needle === haystack;
+    }
+
+    let indexHaystack = 0;
+    for (let indexNeedle = 0; indexNeedle < needleLength; indexNeedle++) {
+        const needleChar = needle.charCodeAt(indexNeedle);
+        let foundChar = false;
+
+        while (indexHaystack < haystackLength) {
+            if (haystack.charCodeAt(indexHaystack++) === needleChar) {
+                foundChar = true;
+                break;
+            }
+        }
+
+        if(!foundChar){
+            return false;
+        }
+    }
+    return true;
+}
+
 function autocomplete(val) {
 
     addExerciseBtn.style.visibility = "visible";
     renameExerciseBtn.style.visibility = currentExercise !== undefined ? "visible" : "hidden";
 
     // Search for the exercise if more than 1 chars are in the val
-    let exerciseReturn = getExercisesByName(val);
+    let exerciseReturn = exercises.filter(e => fuzzySearch(val, e.name));
 
     // Display / cleanup results
     if (exerciseReturn.length == 0 && document.getElementById('autocomplete')) {
@@ -79,19 +111,8 @@ function getExerciseByID(id) {
     return exercises.find((element) => element.id == id)
 }
 
-function getExercisesByName(name) {
-    let exerciseReturn = [];
-    for (let i = 0; i < exercises.length && name.length > 0; i++) {
-        if (name.toLowerCase() === exercises[i].name.toLowerCase().slice(0, name.length)) {
-            exerciseReturn.push(exercises[i]);
-        }
-    }
-    return exerciseReturn;
-}
-
 function clearRepsAndWeightsInputs() {
     weightInput.value = "";
-    repsInput.value = DEFAULT_REPS;
 }
 
 function reloadExercisesList(){
@@ -203,10 +224,6 @@ function exportData() {
 searchBox.oninput = function (ev) {
     autocomplete(searchBox.value);
 };
-
-searchBox.onclick = () => {
-    searchBox.select();
-}
 
 saveBtn.onclick = function (ev) {
     saveSets();

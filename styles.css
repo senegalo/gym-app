@@ -109,3 +109,7 @@ input {
 #history {
     visibility: hidden;
 }
+
+.grey-background {
+    background: #d4d4d4;
+}
